@@ -1,6 +1,8 @@
 from ping3 import ping
 from .koneksi import customConnection
 from mysql.connector import Error
+from services.encryption import decode
+from classes.cls_server import ServerDb
 
 
 class PingResponse:
@@ -37,6 +39,35 @@ def ping_host(host: str, name: str = None) -> PingResponse:
     return PingResponse(host=host, message=message, status=False)
 
 
+def ping_db_obj(server: ServerDb):
+    response = PingResponse(
+        host=server.host,
+        message="",
+        status=False,
+        port=server.port
+    )
+    try:
+        connection = customConnection(
+            host=server.host,
+            port=server.port,
+            user=server.user,
+            password=decode(server.password),
+            database=server.schema
+        )
+        if connection.is_connected():
+            result = f"✅ Pinging {server.name if server.name else server.host}:{server.port} Connected"
+            response = PingResponse(
+                host=server.host, message=result, status=True, port=server.port)
+    except Error as e:
+        result = f"❌ Pinging {server.name if server.name else server.host} Error while connecting to MySQL using Connector/Python \n{e}"
+        response = PingResponse(
+            host=server.host, message=result, status=False, port=server.port)
+    finally:
+        if connection.is_connected():
+            connection.close()
+    return response
+
+
 def ping_db(
         host: str,
         port: int,
@@ -51,12 +82,13 @@ def ping_db(
             host=host,
             port=port,
             user=username,
-            password=password,
+            password=decode(password),
             database=database
         )
         if connection.is_connected():
             result = f"✅ Pinging {name if name else host}:{port} Connected"
-            response = PingResponse(host=host, message=result, status=True, port=port)
+            response = PingResponse(
+                host=host, message=result, status=True, port=port)
     except Error as e:
         result = f"❌ Pinging {name if name else host} Error while connecting to MySQL using Connector/Python \n{e}"
         response = PingResponse(

@@ -6,6 +6,7 @@ load_dotenv()
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_GROUP_ID = os.getenv("TELEGRAM_GROUP_ID")
+SECURITY_KEY = os.getenv("SECURITY_KEY")
 
 
 class ECommands(Enum):

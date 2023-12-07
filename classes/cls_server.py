@@ -1,3 +1,6 @@
+from services.encryption import encode, decode
+
+
 class Server:
     def __init__(self, host: str, name: str, is_online: bool):
         self.host = host
@@ -40,3 +43,6 @@ class ServerDb:
             schema=row['schema'],
             name=row['name']
         )
+
+    def decodePassword(self):
+        return decode(self.password)

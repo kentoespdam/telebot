@@ -64,8 +64,8 @@ def main():
         fallbacks=[CommandHandler("cancel", cancel)]
     )
     app.add_handler(conv_handler)
-    # jobs = app.job_queue
-    # jobs.run_repeating(toThread, interval=30, first=5)
+    jobs = app.job_queue
+    jobs.run_repeating(toThread, interval=30, first=5)
 
     print("Bot starting...")
     app.run_polling(allowed_updates=Update.ALL_TYPES)

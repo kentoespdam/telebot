@@ -1,0 +1,15 @@
+version: "3.4"
+
+services:
+  telebot:
+    container_name: telebot-python
+    build: 
+      context: ../
+      dockerfile: docker/Dockerfile
+    image: telebot-python
+    networks:
+      - back-tier
+
+networks:
+  back-tier:
+    external: true

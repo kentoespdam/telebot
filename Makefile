@@ -7,3 +7,8 @@ build:
 start:
 	@echo "Starting..."
 	docker compose -f docker/docker-compose.yml up -d
+
+.PHONY: stop
+stop:
+	@echo "Stopping..."
+	docker compose -f docker/docker-compose.yml down

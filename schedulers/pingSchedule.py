@@ -7,6 +7,7 @@ from services.serverListService import getServerList
 import asyncio
 import datetime
 from classes.cls_server import Server, ServerDb
+from telegram.ext import CallbackContext
 
 ####################### ping server #########################
 def doPing(row) -> None:
@@ -59,7 +60,7 @@ def pingDbJob() -> None:
     pool.shutdown(wait=True)
 ######################## ping db ############################
 
-def toThread():
+async def toThread(context: CallbackContext):
     rootPool = concurrent.futures.ThreadPoolExecutor(max_workers=10)
     rootPool.submit(pingServerJob)
     rootPool.submit(pingDbJob)

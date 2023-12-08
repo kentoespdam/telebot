@@ -51,7 +51,8 @@ async def pingServerHandler(update: Update, context: ContextTypes) -> int:
     await update.message.reply_text(
         "Choose server to ping:",
         reply_markup=reply_markup,
-        parse_mode="Markdown"
+        parse_mode="Markdown",
+        disable_notification=True
     )
     return CHOOSE_SERVER
 
@@ -63,6 +64,7 @@ async def pingServerDbHandler(update: Update, context: ContextTypes) -> int:
     await update.message.reply_text(
         "Choose server to ping:",
         reply_markup=reply_markup,
-        parse_mode="Markdown"
+        parse_mode="Markdown",
+        disable_notification=True
     )
     return CHOOSE_DB

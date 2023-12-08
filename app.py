@@ -1,22 +1,29 @@
 import logging
-
 from telegram import Update
-from config import CHOOSE_DB, CHOOSE_SERVER, ECommands, TELEGRAM_TOKEN
+from config import (
+    TELEGRAM_TOKEN,
+    CHOOSE_DB,
+    CHOOSE_SERVER,
+    ECommands
+)
 from handlers.startHandler import start, commands
-from handlers.pingHandler import pingDbHandler, pingHandler, pingServerDbHandler, pingServerHandler
+from handlers.pingHandler import (
+    pingDbHandler,
+    pingHandler,
+    pingServerDbHandler,
+    pingServerHandler
+)
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
     ConversationHandler,
-    CallbackQueryHandler
+    CallbackQueryHandler,
 )
 from callbacks.pingCallback import selectedDb, selectedServer
 from callbacks.cancelCallback import cancel
 from warnings import filterwarnings
 from telegram.warnings import PTBRuntimeWarning
-import schedule
 from schedulers.pingSchedule import toThread
-import time
 
 # enable logging
 logging.basicConfig(
@@ -29,10 +36,8 @@ filterwarnings(
     category=PTBRuntimeWarning
 )
 # set higher logging level for httpx to avoid all GET and POST requests being logged
-# logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpx").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
-
-schedule.every(30).seconds.do(toThread)
 
 
 def main():
@@ -47,12 +52,20 @@ def main():
             CommandHandler(ECommands.PING_DB_SERVER.value, pingServerDbHandler)
         ],
         states={
-            CHOOSE_SERVER: [CallbackQueryHandler(selectedServer)],
-            CHOOSE_DB: [CallbackQueryHandler(selectedDb)]
+            CHOOSE_SERVER: [
+                CallbackQueryHandler(cancel, pattern=f"^Cancel$"),
+                CallbackQueryHandler(selectedServer),
+            ],
+            CHOOSE_DB: [
+                CallbackQueryHandler(cancel, pattern=f"^Cancel$"),
+                CallbackQueryHandler(selectedDb),
+            ],
         },
         fallbacks=[CommandHandler("cancel", cancel)]
     )
     app.add_handler(conv_handler)
+    # jobs = app.job_queue
+    # jobs.run_repeating(toThread, interval=30, first=5)
 
     print("Bot starting...")
     app.run_polling(allowed_updates=Update.ALL_TYPES)
@@ -60,6 +73,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    while True:
-        schedule.run_pending()
-        time.sleep(1)

@@ -1,5 +1,5 @@
 from ping3 import ping
-from .koneksi import customConnection
+from services.koneksi import customConnection
 from mysql.connector import Error
 from services.encryption import decode
 from classes.cls_server import ServerDb

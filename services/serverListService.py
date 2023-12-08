@@ -26,7 +26,6 @@ def findCurrentServer(servers: list, query: str, table: ETables):
         return next((server for server in servers if server['host'] == query), None)
     elif table == ETables.SERVER_DB:
         query = json.loads(query)
-        print(query)
         return next((server for server in servers if server['host'] == query['host'] and server['port'] == int(query['port'])), None)
 
 
@@ -35,7 +34,7 @@ def chunk_list(list: list, chunk_size: int):
         yield list[i:i + chunk_size]
 
 
-def keyboardList(servers: list, table: ETables):
+def keyboardList(servers: list, table: ETables) -> list:
     keyboard = []
     keyboard.clear()
     i = 1
@@ -61,4 +60,5 @@ def keyboardList(servers: list, table: ETables):
             )
         keyboard.append(row)
         i += 1
+    keyboard.append([InlineKeyboardButton("Cancel", callback_data="Cancel")])
     return keyboard

@@ -3,6 +3,8 @@ import os
 from dotenv import load_dotenv
 from prometheus_pandas import query
 import requests
+from ping3 import ping
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 load_dotenv()
 
@@ -12,7 +14,9 @@ PROM_URL = str(os.getenv("PROMETHEUS_URL"))
 
 PROM_QUERY = query.Prometheus(PROM_URL)
 
-SET_IP, CHOOSE_SERVER = range(2)
+SET_IP,CHOOSE_SERVER, SET_HOST_DB, SET_HOST_PORT, SET_USER_DB, SET_PASSWORD_DB = range(6)
+
+SERVER, DB = range(2)
 
 
 class ECommands(Enum):
@@ -40,13 +44,37 @@ class ECommands(Enum):
         )
 
 
-def fetch_server_list():
+def fetch_server_list(find:SERVER|DB):
     uri = f"{PROM_URL}/api/v1/targets"
     response = requests.get(uri)
     ip_server_list = []
     for server in response.json()['data']['activeTargets']:
-        if server['scrapePool'] == "linux-server" or server['scrapePool'] == "win-server":
-            ip_server_list.append(server['labels']['instance'].split(":")[0])
+        if find == SERVER:
+            if server['scrapePool'] == "linux-server" or server['scrapePool'] == "win-server":
+                ip_server_list.append(server['labels']['instance'].split(":")[0])
+        else:
+            if server['scrapePool'] == "mysql" or server['scrapePool'] == "mariadb":
+                ip_server_list.append(server['labels']['instance'].split(":")[0])
 
     ip_server_list.sort()
     return ip_server_list
+
+
+def do_ping(ip: str) -> str:
+    output_text = ""
+    for i in range(5):
+        output_text += f"Ping {ip} ... "
+        delay = ping(ip, seq=i, unit='ms')
+        if delay is None:
+            output_text += "Request timed out.\n"
+        else:
+            output_text += f"{int(delay)} ms\n"
+    return f"""
+        ```Terminal \n{output_text}```
+        """
+
+
+def finish_keyboard():
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton("✅ Finish ", callback_data="finish")]
+    ])

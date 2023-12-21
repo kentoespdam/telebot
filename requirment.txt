@@ -2,3 +2,4 @@ python-dotenv==1.0.0
 ping3==4.0.4
 prometheus_api_client==0.5.4
 prometheus_pandas==0.3.3
+asyncping3==3.0.1

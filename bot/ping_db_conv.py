@@ -6,8 +6,6 @@ from config import (
     SET_USER_DB,
     SET_PASSWORD_DB,
 )
-import json
-
 from mysql.connector import connect, Error
 
 

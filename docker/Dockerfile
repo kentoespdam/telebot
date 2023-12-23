@@ -8,6 +8,7 @@ RUN pip install --user -r requirements.txt
 FROM base AS runner
 WORKDIR /app
 COPY --from=builder /root/.local /root/.local
+COPY .env .env
 COPY . .
 
 ENV PATH=/root/.local:$PATH

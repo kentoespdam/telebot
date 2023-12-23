@@ -1,10 +1,14 @@
 from enum import Enum
 import os
 from dotenv import load_dotenv
-from prometheus_pandas import query
+from prometheus_api_client import PrometheusConnect
 import requests
 from ping3 import ping
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import (
+    InlineKeyboardButton,
+    InlineKeyboardMarkup
+)
+
 
 load_dotenv()
 
@@ -12,9 +16,14 @@ TELEGRAM_TOKEN = str(os.getenv("TELEGRAM_TOKEN"))
 
 PROM_URL = str(os.getenv("PROMETHEUS_URL"))
 
-PROM_QUERY = query.Prometheus(PROM_URL)
+PROM_QUERY = PrometheusConnect(url=PROM_URL)
 
-SET_IP, SET_HOST_DB, SET_PORT_DB, SET_USER_DB, SET_PASSWORD_DB = range(5)
+(
+    SET_IP, SET_HOST_DB,
+    SET_PORT_DB, SET_USER_DB,
+    SET_PASSWORD_DB, CHOOSE_SERVER,
+    CHOOSE_SERVER_DB
+) = range(7)
 
 SERVER, DB = range(2)
 
@@ -25,7 +34,7 @@ class ECommands(Enum):
     PING = "ping"
     PING_DB = "ping_db"
     PING_SERVER = "ping_server"
-    # PING_DB_SERVER = "ping_db_server"
+    PING_DB_SERVER = "ping_db_server"
 
     def commandList():
         commands = []
@@ -56,10 +65,28 @@ def fetch_server_list(find: SERVER | DB):
         else:
             if server['scrapePool'] == "mysql" or server['scrapePool'] == "mariadb":
                 ip_server_list.append(
-                    server['labels']['instance'].split(":")[0])
+                    server['labels']['instance'])
 
     ip_server_list.sort()
     return ip_server_list
+
+
+def list_server_keyboard(servers):
+    keyboard = []
+    keyboard.clear()
+    if (len(servers) > 0):
+        for chunk in chunk_list(servers, 2):
+            row = []
+            for server in chunk:
+                row.append(InlineKeyboardButton(server, callback_data=server))
+            keyboard.append(row)
+    keyboard.append([InlineKeyboardButton("🚫 cancel", callback_data="cancel")])
+    return InlineKeyboardMarkup(keyboard)
+
+
+def chunk_list(list, size):
+    for i in range(0, len(list), size):
+        yield list[i:i + size]
 
 
 def do_ping(ip: str) -> str:

@@ -75,6 +75,6 @@ def koneksi(data: dict) -> str:
             user=data["user_db"],
             password=data["password_db"],
         )
-        return f"✅ Connection Success...```DB version: {koneksi.get_server_info()}```"
+        return f"✅ Connection Success...```Version: {koneksi.get_server_info()}```"
     except Error as e:
         return f"Error while connecting to db: {e}"

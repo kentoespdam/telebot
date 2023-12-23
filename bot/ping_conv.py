@@ -11,7 +11,7 @@ async def start_ping(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 async def set_ip(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     if update.message:
         text = update.message.text
-        if text == "Done":
+        if text == "cancel":
             return ConversationHandler.END
 
         await update.message.reply_text(

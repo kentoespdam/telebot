@@ -14,7 +14,7 @@ PROM_URL = str(os.getenv("PROMETHEUS_URL"))
 
 PROM_QUERY = query.Prometheus(PROM_URL)
 
-SET_IP,CHOOSE_SERVER, SET_HOST_DB, SET_HOST_PORT, SET_USER_DB, SET_PASSWORD_DB = range(6)
+SET_IP, SET_HOST_DB, SET_PORT_DB, SET_USER_DB, SET_PASSWORD_DB = range(5)
 
 SERVER, DB = range(2)
 
@@ -23,7 +23,7 @@ class ECommands(Enum):
     START = "start"
     COMMANDS = "commands"
     PING = "ping"
-    # PING_DB = "ping_db"
+    PING_DB = "ping_db"
     PING_SERVER = "ping_server"
     # PING_DB_SERVER = "ping_db_server"
 
@@ -44,17 +44,19 @@ class ECommands(Enum):
         )
 
 
-def fetch_server_list(find:SERVER|DB):
+def fetch_server_list(find: SERVER | DB):
     uri = f"{PROM_URL}/api/v1/targets"
     response = requests.get(uri)
     ip_server_list = []
     for server in response.json()['data']['activeTargets']:
         if find == SERVER:
             if server['scrapePool'] == "linux-server" or server['scrapePool'] == "win-server":
-                ip_server_list.append(server['labels']['instance'].split(":")[0])
+                ip_server_list.append(
+                    server['labels']['instance'].split(":")[0])
         else:
             if server['scrapePool'] == "mysql" or server['scrapePool'] == "mariadb":
-                ip_server_list.append(server['labels']['instance'].split(":")[0])
+                ip_server_list.append(
+                    server['labels']['instance'].split(":")[0])
 
     ip_server_list.sort()
     return ip_server_list

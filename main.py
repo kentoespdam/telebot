@@ -1,15 +1,24 @@
 from telegram import Update
 from telegram.ext import (
-    Application, 
+    Application,
     ConversationHandler,
-    CommandHandler, 
+    CommandHandler,
     MessageHandler,
-    CallbackQueryHandler, 
+    CallbackQueryHandler,
     filters)
 from bot.ping_conv import start_ping, set_ip
-from config import TELEGRAM_TOKEN, SET_IP,  ECommands, CHOOSE_SERVER
+from config import (
+    SET_IP,
+    SET_HOST_DB,
+    SET_PORT_DB,
+    SET_USER_DB,
+    SET_PASSWORD_DB,
+    TELEGRAM_TOKEN,
+    ECommands
+)
 from bot.start import start_bot, commands_bot
 from bot.ping_server_conv import ping_server, choose_server
+from bot.ping_db_conv import start_ping_db, set_host_db, set_port_db, set_user_db, set_password_db
 
 
 def main():
@@ -17,11 +26,28 @@ def main():
     conv_handler = ConversationHandler(
         entry_points=[
             CommandHandler(ECommands.PING.value, start_ping),
+            CommandHandler(ECommands.PING_DB.value, start_ping_db)
         ],
         states={
             SET_IP: [
                 MessageHandler(filters.TEXT & ~(
-                    filters.COMMAND | filters.Regex("^Done$")), set_ip)
+                    filters.COMMAND | filters.Regex("^cancel$")), set_ip)
+            ],
+            SET_HOST_DB: [
+                MessageHandler(filters.TEXT & ~(
+                    filters.COMMAND | filters.Regex("^cancel$")), set_host_db)
+            ],
+            SET_PORT_DB: [
+                MessageHandler(filters.TEXT & ~(
+                    filters.COMMAND | filters.Regex("^cancel$")), set_port_db)
+            ],
+            SET_USER_DB: [
+                MessageHandler(filters.TEXT & ~(
+                    filters.COMMAND | filters.Regex("^cancel$")), set_user_db)
+            ],
+            SET_PASSWORD_DB: [
+                MessageHandler(filters.TEXT & ~(
+                    filters.COMMAND | filters.Regex("^cancel$")), set_password_db)
             ],
         },
         fallbacks=[]
